@@ -4,7 +4,7 @@ if(POLICY CMP0020)
   cmake_policy(SET CMP0020 NEW)
 endif()
 
-PROJECT(VTK_GL)
+PROJECT(QT_GL)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -83,7 +83,7 @@ file(GLOB CXX_FILES *.cpp *.cxx)
 
 QT4_WRAP_UI(UISrcs ${UI_FILES})
 QT4_WRAP_CPP(MOCSrcs ${QT_WRAP})
-add_executable(VTK_GL ${CXX_FILES} ${UISrcs} ${MOCSrcs})
+add_executable(QT_GL ${CXX_FILES} ${UISrcs} ${MOCSrcs})
 
 
 #########################################################
@@ -103,6 +103,6 @@ add_executable(VTK_GL ${CXX_FILES} ${UISrcs} ${MOCSrcs})
 #########################################################
 #target_link_libraries(VTK_GL ${QT_LIBRARIES} OSUFlowVTK_d OSUFlow_d ${VTK_LIBRARIES} ${OPENGL_LIBRARIES} ${LIBPCA_LIBRARIES})
 
-target_link_libraries(VTK_GL ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )
+target_link_libraries(QT_GL ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )
 
 
