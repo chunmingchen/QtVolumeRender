@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "openGL_window.h"
+#include "openGL_VTK_window.h"
 
 namespace Ui {
 class MainWindow;

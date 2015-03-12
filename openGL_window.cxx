@@ -4,6 +4,7 @@
 /////////////////////////////////////////////////////
 
 #include "cpp_headers.h"
+#include "vtk_headers.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <openGL_window.h>

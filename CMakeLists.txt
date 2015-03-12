@@ -57,8 +57,8 @@ include_directories(${GLUT_INCLUDE_DIRS})
 #########################################################
 # Include VTK
 #########################################################
-#find_package(VTK REQUIRED)
-#include(${VTK_USE_FILE})
+find_package(VTK REQUIRED)
+include(${VTK_USE_FILE})
 
 #########################################################
 # Include QT4
@@ -103,6 +103,6 @@ add_executable(QT_GL ${CXX_FILES} ${UISrcs} ${MOCSrcs})
 #########################################################
 #target_link_libraries(VTK_GL ${QT_LIBRARIES} OSUFlowVTK_d OSUFlow_d ${VTK_LIBRARIES} ${OPENGL_LIBRARIES} ${LIBPCA_LIBRARIES})
 
-target_link_libraries(QT_GL ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )
+target_link_libraries(QT_GL ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${VTK_LIBRARIES})
 
 
