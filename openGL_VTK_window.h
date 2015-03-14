@@ -1,6 +1,4 @@
 /////////////////////////////////////////////////////
-//Soumya Dutta
-//OSU CSE 2014
 /////////////////////////////////////////////////////
 
 #ifndef OPENGL_VTK_HEADER_H
@@ -19,12 +17,12 @@ public:
 
     openGL_VTK_window(QWidget *parent);
 
-    void paintGL();
-    void initializeGL();
-    void resizeGL(int w,int h);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void keyPressEvent(QKeyEvent *);
+    virtual void paintGL();
+    virtual void initializeGL();
+    virtual void resizeGL(int w,int h);
+    virtual void mousePressEvent(QMouseEvent *event);
+    virtual void mouseMoveEvent(QMouseEvent *event);
+    virtual void keyPressEvent(QKeyEvent *);
 
 protected:
 

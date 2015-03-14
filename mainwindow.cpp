@@ -7,8 +7,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    //renderer = new openGL_window();
-
 
 }
 
