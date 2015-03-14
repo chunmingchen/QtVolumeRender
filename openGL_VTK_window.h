@@ -14,6 +14,7 @@ class openGL_VTK_window : public QGLWidget
     Q_OBJECT
 
 public:
+    float eyeAngle = 60; // degree
 
     openGL_VTK_window(QWidget *parent);
 

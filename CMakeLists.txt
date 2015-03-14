@@ -42,6 +42,9 @@ endif(NOT OPENGL_FOUND)
 find_package(GLUT REQUIRED)
 include_directories(${GLUT_INCLUDE_DIRS})
 
+find_package(GLEW)
+include_directories(${GLEW_INCLUDE_DIRS})
+
 #########################################################
 # Include GLEW
 #########################################################
@@ -53,6 +56,19 @@ include_directories(${GLUT_INCLUDE_DIRS})
 #if(NOT GLEW_FOUND)
 #    message(ERROR " GLEW not found!")
 #endif(NOT GLEW_FOUND)
+
+
+########################################################
+# CUDA : should be put before VTK
+########################################################
+#set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-O3 -gencode arch=compute_30,code=sm_30 -Xptxas -v)
+find_package(CUDA QUIET REQUIRED)
+include_directories( ${CUDA_TOOLKIT_ROOT_DIR}/include  ${CUDA_SDK_ROOT_DIR}/common/inc )
+link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib/x64 )# ${CUDA_SDK_ROOT_DIR}/common/lib/x64 )
+#LINUX:
+link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
+CUDA_ADD_LIBRARY(volumeRender_kernel ${CMAKE_SOURCE_DIR}/volRender_kernel.cu)
+
 
 #########################################################
 # Include VTK
@@ -77,13 +93,15 @@ include(${QT_USE_FILE})
 ########################################################
 
 
+
 file(GLOB UI_FILES *.ui)
 file(GLOB QT_WRAP *.h)
 file(GLOB CXX_FILES *.cpp *.cxx)
 
 QT4_WRAP_UI(UISrcs ${UI_FILES})
 QT4_WRAP_CPP(MOCSrcs ${QT_WRAP})
-add_executable(VolumeRender ${CXX_FILES} ${UISrcs} ${MOCSrcs})
+
+add_executable(VolumeRender ${CXX_FILES} ${UISrcs} ${MOCSrcs} )
 
 
 #########################################################
@@ -103,6 +121,6 @@ add_executable(VolumeRender ${CXX_FILES} ${UISrcs} ${MOCSrcs})
 #########################################################
 #target_link_libraries(VTK_GL ${QT_LIBRARIES} OSUFlowVTK_d OSUFlow_d ${VTK_LIBRARIES} ${OPENGL_LIBRARIES} ${LIBPCA_LIBRARIES})
 
-target_link_libraries(VolumeRender ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${VTK_LIBRARIES})
+target_link_libraries(VolumeRender ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${VTK_LIBRARIES} ${GLEW_LIBRARIES} volumeRender_kernel)
 
 

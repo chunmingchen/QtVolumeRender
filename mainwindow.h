@@ -2,8 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "openGL_window.h"
 #include "VRWidget.h"
+#include "openGL_window.h"
+#include "vtk_headers.h"
 
 namespace Ui {
 class MainWindow;
@@ -17,10 +18,17 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private slots:
+    void on_btnLoad_clicked();
+
 private:
     Ui::MainWindow *ui;
 
     openGL_window* renderer;
+
+
+    vtkSmartPointer<vtkImageData> data;
+    vtkSmartPointer<vtkImageData> label;
 };
 
 #endif // MAINWINDOW_H

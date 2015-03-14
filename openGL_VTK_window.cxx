@@ -24,7 +24,7 @@ openGL_VTK_window :: openGL_VTK_window(QWidget *parent)
     ren->AddActor( coneActor.GetPointer() );
     renWin->AddRenderer( ren.GetPointer() );
 
-    this->resize(800, 600);
+    this->setFocusPolicy(Qt::ClickFocus);
 }
 
 void openGL_VTK_window :: initializeGL()
@@ -96,17 +96,6 @@ void openGL_VTK_window :: paintGL()
     glEnable(GL_NICEST);
     glEnable(GL_LINE_SMOOTH);
 
-    //glutSolidTeapot(1);
-    glBegin(GL_POINTS);
-    glColor3f(1,1,1);
-    glVertex2f(0,0);
-    glVertex2f(1,0);
-    glVertex2f(0,1);
-    glEnd();
-    glPointSize(10);
-
-    cout << "paint" << endl;
-
     // vtk camera -> set opengl modelview matrix
     vtkCamera *camera = ren->GetActiveCamera();
     double eyein[3] = {0,0,5};
@@ -114,23 +103,35 @@ void openGL_VTK_window :: paintGL()
     camera->SetPosition(transform->TransformVector(eyein));
     camera->SetViewUp(transform->TransformVector(upin));
     camera->SetFocalPoint(0,0,0);
+    camera->SetEyeAngle(this->eyeAngle);
 
-    // get modelview matrix
-    vtkMatrix4x4 *m = camera->GetModelViewTransformMatrix();
-    double *f = &m->Element[0][0];
+    // camera - opengl
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    int *size = this->renWin->GetSize();
+    double *clipping  = camera->GetClippingRange();
+    //cout << clipping[0] << " " << clipping[1];
+    gluPerspective(this->eyeAngle,  size[0]/(GLfloat)size[1],clipping[0],clipping[1]);
 
-    // opengl
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glMultTransposeMatrixd(f);
+    gluLookAt(0,0,5,0,0,0,0,1,0);
+
+    // get modelview matrix
+    glLoadIdentity();
+    vtkMatrix4x4 *m = camera->GetModelViewTransformMatrix() ;
+    glMultTransposeMatrixd(  &m->Element[0][0] );
+    //glMultTransposeMatrixd(  &transform->GetMatrix()->Element[0][0] );
 
     //////////// draw /////////
     opengl_draw();
     ///////////////////////////
 
-
-    glLoadIdentity();
-    renWin->Render();
+    // Render VTK
+    if (0) {
+        glLoadIdentity();
+        renWin->Render();
+    }
 
 
     //glutSwapBuffers();

@@ -37,9 +37,9 @@
       </property>
       <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="1">
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QPushButton" name="btnLoad">
          <property name="text">
-          <string/>
+          <string>Load</string>
          </property>
          <property name="icon">
           <iconset>
@@ -48,7 +48,7 @@
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="btnPrev">
          <property name="text">
           <string>Prev</string>
          </property>
@@ -59,7 +59,7 @@
         </widget>
        </item>
        <item row="0" column="2">
-        <widget class="QPushButton" name="pushButton_3">
+        <widget class="QPushButton" name="btnNext">
          <property name="text">
           <string>Next</string>
          </property>
@@ -96,7 +96,7 @@
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>true</bool>
+    <bool>false</bool>
    </attribute>
   </widget>
   <action name="actionLoad">

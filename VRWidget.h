@@ -5,7 +5,11 @@
 #define VRWIDGE_HEADER_H
 
 #include <cpp_headers.h>
+#include "CudaGLBase.h"
 #include "openGL_VTK_window.h"
+#include "vtk_headers.h"
+
+#define TrFn_WIDTH 256
 
 class VRWidget : public openGL_VTK_window
 {
@@ -14,17 +18,58 @@ class VRWidget : public openGL_VTK_window
 public:
 
     VRWidget(QWidget *parent);
+    virtual ~VRWidget();
 
-    //void paintGL();
-    void initializeGL();
-    void resizeGL(int w,int h);
-    //void mousePressEvent(QMouseEvent *event);
-    //void mouseMoveEvent(QMouseEvent *event);
-    void keyPressEvent(QKeyEvent *);
+    //virtual void paintGL();
+    virtual void initializeGL();
+    virtual void resizeGL(int w,int h);
+    //virtual void mousePressEvent(QMouseEvent *event);
+    //virtual void mouseMoveEvent(QMouseEvent *event);
+    virtual void keyPressEvent(QKeyEvent *);
+
+
+    void setData(vtkSmartPointer<vtkImageData> data)
+    {
+        using namespace std;
+        int *extent = data->GetExtent();
+        int w = extent[1]+1,
+            h = extent[3]+1,
+            d = extent[5]+1;
+        gpuComm->vrParam.maxVolWidthInVoxel = max(max(w,h),d);
+        gpuComm->vrParam.volBoundry[0] = w/(float)gpuComm->vrParam.maxVolWidthInVoxel ;
+        gpuComm->vrParam.volBoundry[1] = h/(float)gpuComm->vrParam.maxVolWidthInVoxel ;
+        gpuComm->vrParam.volBoundry[2] = d/(float)gpuComm->vrParam.maxVolWidthInVoxel ;
+
+        g_createBrickPool(w,h,d);
+        g_uploadBrickPool(data->GetScalarPointer(), w, h, d, 0,0,0);
+
+        // init transfer function
+        g_releaseTrFn();
+        g_createTrFn(TrFn_WIDTH, TrFn_WIDTH);
+
+        initialized=true;
+    }
+
+    void setTrFn2D(std::vector<float4> &trfn)
+    {
+        g_uploadTrFn(&trfn[0], TrFn_WIDTH*TrFn_WIDTH);
+    }
+
+    void removeData() {//todo
+        g_releaseTrFn();
+    }
 
 protected:
+    CudaGLBase *gpuComm;
+
+    bool initialized = false;
+
     virtual void opengl_draw();
 
+    inline void setBgColor(unsigned char r, unsigned char g, unsigned char b)
+    {
+        gpuComm->setBgColor(make_float4(r/255.f,g/255.f,b/255.f,1.f));
+    }
 };
 
 #endif

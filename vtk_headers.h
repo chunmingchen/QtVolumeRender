@@ -9,3 +9,6 @@
 #include "vtkMatrix4x4.h"
 #include "vtkTransform.h"
 #include "vtkOpenGLProperty.h"
+#include "vtkSmartPointer.h"
+#include "vtkImageData.h"
+#include "vtkXMLImageDataReader.h"
