@@ -183,7 +183,7 @@ void g_createBrickPool(int w, int h, int d)
     CUDA_SAFE_CALL( cudaMalloc3DArray(&da_brickPool, &channelDesc, ext) );
 
     // set texture parameters
-    texBrickPool.normalized = false;                      // access with normalized texture coordinates
+    texBrickPool.normalized = true; //false;                      // access with normalized texture coordinates?
 #ifdef LINTERP_LOD_DATA
     texBrickPool.filterMode = cudaFilterModeLinear;      // linear interpolation
 #else

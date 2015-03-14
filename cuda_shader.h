@@ -88,7 +88,7 @@ inline __device__ float4 d_shader(const float3 &texPos)
 #endif //LINTERP_LOD_DATA
 #else
     LOD_DATA_TYPE val = tex3D(texBrickPool, texPos.x, texPos.y, texPos.z) ;
-    return make_float4(val, val, val, val* c_vrParam.intensity); // no trfn
+    return make_float4(val, val, val, val *c_vrParam.intensity); // no trfn
 #endif
 }
 

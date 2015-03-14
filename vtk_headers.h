@@ -12,3 +12,5 @@
 #include "vtkSmartPointer.h"
 #include "vtkImageData.h"
 #include "vtkXMLImageDataReader.h"
+#include "vtkPointData.h"
+#include "vtkImageCast.h"

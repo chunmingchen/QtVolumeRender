@@ -28,27 +28,7 @@ public:
     virtual void keyPressEvent(QKeyEvent *);
 
 
-    void setData(vtkSmartPointer<vtkImageData> data)
-    {
-        using namespace std;
-        int *extent = data->GetExtent();
-        int w = extent[1]+1,
-            h = extent[3]+1,
-            d = extent[5]+1;
-        gpuComm->vrParam.maxVolWidthInVoxel = max(max(w,h),d);
-        gpuComm->vrParam.volBoundry[0] = w/(float)gpuComm->vrParam.maxVolWidthInVoxel ;
-        gpuComm->vrParam.volBoundry[1] = h/(float)gpuComm->vrParam.maxVolWidthInVoxel ;
-        gpuComm->vrParam.volBoundry[2] = d/(float)gpuComm->vrParam.maxVolWidthInVoxel ;
-
-        g_createBrickPool(w,h,d);
-        g_uploadBrickPool(data->GetScalarPointer(), w, h, d, 0,0,0);
-
-        // init transfer function
-        g_releaseTrFn();
-        g_createTrFn(TrFn_WIDTH, TrFn_WIDTH);
-
-        initialized=true;
-    }
+    void setData(vtkSmartPointer<vtkImageData> data);
 
     void setTrFn2D(std::vector<float4> &trfn)
     {
