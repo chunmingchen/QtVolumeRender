@@ -12,14 +12,14 @@
 #include <QtOpenGL/QGLWidget>
 #include <QMouseEvent>
 
-class openGL_VTK_window : public QGLWidget
+class GLVTKWidget : public QGLWidget
 {
     Q_OBJECT
 
 public:
     float eyeAngle = 60; // degree
 
-    openGL_VTK_window(QWidget *parent);
+    GLVTKWidget(QWidget *parent);
 
     virtual void paintGL();
     virtual void initializeGL();

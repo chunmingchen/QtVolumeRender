@@ -15,7 +15,7 @@ using namespace std;
 #define FOV 60  // degree
 
 VRWidget :: VRWidget(QWidget *parent)
- : openGL_VTK_window(parent)
+ : GLVTKWidget(parent)
 {
     gpuComm = new CudaGLBase();
     VRParam &vrParam = gpuComm->vrParam;
@@ -58,7 +58,7 @@ VRWidget::~VRWidget()
 
 void VRWidget :: initializeGL()
 {
-    openGL_VTK_window::initializeGL();
+    GLVTKWidget::initializeGL();
     int i=0;
     char *s="";
     glutInit(&i, &s);
@@ -96,7 +96,7 @@ void VRWidget :: keyPressEvent(QKeyEvent* QE)
 
 void VRWidget :: resizeGL(int w, int h)
 {
-   openGL_VTK_window::resizeGL(w, h) ;
+   GLVTKWidget::resizeGL(w, h) ;
 
    gpuComm->resize(w, h);
 }

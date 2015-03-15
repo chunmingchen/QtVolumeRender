@@ -8,13 +8,13 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
-#include "openGL_VTK_window.h"
+#include "GLVTKWidget.h"
 
 using namespace std;
 
 vtkNew<vtkConeSource> cone;
 
-openGL_VTK_window :: openGL_VTK_window(QWidget *parent)
+GLVTKWidget :: GLVTKWidget(QWidget *parent)
  : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
 {
 
@@ -29,7 +29,7 @@ openGL_VTK_window :: openGL_VTK_window(QWidget *parent)
     this->setFocusPolicy(Qt::ClickFocus);
 }
 
-void openGL_VTK_window :: initializeGL()
+void GLVTKWidget :: initializeGL()
 {
     // Here is the trick: we ask the RenderWindow to join the current OpenGL context created by GLUT
     renWin->InitializeFromCurrentContext();
@@ -39,7 +39,7 @@ void openGL_VTK_window :: initializeGL()
 
     cout << "init" << endl;
 }
-void openGL_VTK_window :: resizeGL(int w, int h)
+void GLVTKWidget :: resizeGL(int w, int h)
 {
     glViewport(0,0,w,h);
 
@@ -48,12 +48,12 @@ void openGL_VTK_window :: resizeGL(int w, int h)
     cout << "resize" << endl;
 }
 
-void openGL_VTK_window :: keyPressEvent(QKeyEvent* QE)
+void GLVTKWidget :: keyPressEvent(QKeyEvent* QE)
 {
 }
 
 
-void openGL_VTK_window :: mousePressEvent(QMouseEvent *event)
+void GLVTKWidget :: mousePressEvent(QMouseEvent *event)
 {
     lastPos = event->pos();
     if (event->button() == Qt::LeftButton)
@@ -68,7 +68,7 @@ void openGL_VTK_window :: mousePressEvent(QMouseEvent *event)
     cout<<"clicked "<<event->x()<<"  "<<event->y()<<endl;
 }
 
-void openGL_VTK_window :: mouseMoveEvent(QMouseEvent *event)
+void GLVTKWidget :: mouseMoveEvent(QMouseEvent *event)
 {
     cout<<"dragging "<<event->x()<<"  "<<event->y()<<endl;
 
@@ -103,7 +103,7 @@ void openGL_VTK_window :: mouseMoveEvent(QMouseEvent *event)
     this->update();
 }
 
-void openGL_VTK_window :: paintGL()
+void GLVTKWidget :: paintGL()
 {
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -153,7 +153,7 @@ void openGL_VTK_window :: paintGL()
     //glutSwapBuffers();
 }
 
-void openGL_VTK_window::opengl_draw()
+void GLVTKWidget::opengl_draw()
 {
 
 }

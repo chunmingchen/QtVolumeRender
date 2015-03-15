@@ -8,7 +8,7 @@
 
 #include <cpp_headers.h>
 #include "CudaGLBase.h"
-#include "openGL_VTK_window.h"
+#include "GLVTKWidget.h"
 #include "vtk_headers.h"
 #include "transfer_func1d.h"
 
@@ -16,7 +16,7 @@
 
 using namespace std;
 
-class VRWidget : public openGL_VTK_window
+class VRWidget : public GLVTKWidget
 {
     Q_OBJECT
 

@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include "VRWidget.h"
-#include "openGL_window.h"
 #include "vtk_headers.h"
 
 namespace Ui {
@@ -27,9 +26,6 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-
-    openGL_window* renderer;
-
 
     vtkSmartPointer<vtkImageData> data;
     vtkSmartPointer<vtkImageData> label;
