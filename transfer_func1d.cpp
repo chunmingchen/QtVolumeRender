@@ -166,7 +166,6 @@ void Transfer_Func1D::on_comboBox_currentIndexChanged(const QString &arg1)
 }
 
 void Transfer_Func1D::on_trfn_changed(vector<float> &color, vector<float> &alpha) {
-    std::cout << ("trfn changed!!");
     emit trfn_changed(color, alpha);
 }
 

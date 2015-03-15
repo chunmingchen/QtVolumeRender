@@ -14,3 +14,4 @@
 #include "vtkXMLImageDataReader.h"
 #include "vtkPointData.h"
 #include "vtkImageCast.h"
+#include "vtkFloatArray.h"

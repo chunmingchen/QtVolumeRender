@@ -22,6 +22,10 @@
 texture<LOD_DATA_TYPE, 3, cudaReadModeElementType> texBrickPool;
 //texture<LOD_DATA_TYPE, 3, cudaReadModeNormalizedFloat> texBrickPool;
 
+// 2nd texture
+texture<LOD_DATA_TYPE, 3, cudaReadModeElementType> texLabelPool;
+
+
 // 2d transfer function
 texture<float4, 2, cudaReadModeElementType> texTrFn;
 cudaArray *da_trFn = 0;
@@ -76,12 +80,13 @@ inline __device__ float4 d_shader(const float3 &texPos)
 #ifdef TRFN_2D
 #ifdef LINTERP_LOD_DATA
     LOD_DATA_TYPE val = tex3D(texBrickPool, texPos.x, texPos.y, texPos.z);
+    LOD_DATA_TYPE label = tex3D(texLabelPool, texPos.x, texPos.y, texPos.z);
 
     // normalize val
     val = (val-c_vrParam.value_min)*(c_vrParam.value_dist);    // rmap scale to [0 , 1]
 
     // 1dtrfn lookup
-    return tex2D(texTrFn, val, val);
+    return tex2D(texTrFn, val, label);
 
     /// lod methods
 	// nearest neighbor

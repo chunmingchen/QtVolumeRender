@@ -33,7 +33,7 @@ public:
     virtual void keyPressEvent(QKeyEvent *);
 
 
-    void setData(vtkSmartPointer<vtkImageData> data);
+    void setData(vtkSmartPointer<vtkImageData> data, vtkSmartPointer<vtkImageData> label);
 
     void setTrFn2D();
 

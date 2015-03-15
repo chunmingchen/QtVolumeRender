@@ -86,6 +86,11 @@ extern "C"
     void g_releaseBrickPool();
     void g_uploadBrickPool(void *h_volume, int w, int h, int d, int x, int y, int z);
 
+    // label
+    void g_createLabelPool(int w, int h, int d);
+    void g_releaseLabelPool();
+    void g_uploadLabelPool(void *h_volume, int w, int h, int d, int x, int y, int z);
+
 
 	// transfer function
 

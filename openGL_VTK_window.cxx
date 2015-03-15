@@ -73,11 +73,11 @@ void openGL_VTK_window :: mouseMoveEvent(QMouseEvent *event)
     cout<<"dragging "<<event->x()<<"  "<<event->y()<<endl;
 
     if (xform_mode==XFORM_ROTATE) {
-      float x_angle = (event->x() - lastPos.x())/2;
+      float x_angle = (event->x() - lastPos.x())/5.;
       //if (x_angle > 180) x_angle -= 360;
       //else if (x_angle <-180) x_angle += 360;
 
-      float y_angle = (event->y() - lastPos.y())/2;
+      float y_angle = (event->y() - lastPos.y())/5.;
 
       double axis[3];
       axis[0] = -y_angle;
@@ -113,7 +113,7 @@ void openGL_VTK_window :: paintGL()
 
     // vtk camera -> set opengl modelview matrix
     vtkCamera *camera = ren->GetActiveCamera();
-    double eyein[3] = {0,0,5};
+    double eyein[3] = {0,0,2};
     double upin[3] = {0, 1, 0};
     camera->SetPosition(transform->TransformVector(eyein));
     camera->SetViewUp(transform->TransformVector(upin));
@@ -130,7 +130,7 @@ void openGL_VTK_window :: paintGL()
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(0,0,5,0,0,0,0,1,0);
+    gluLookAt(0,0,2,0,0,0,0,1,0);
 
     // get modelview matrix
     //glLoadIdentity();

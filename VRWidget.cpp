@@ -139,29 +139,34 @@ void VRWidget:: opengl_draw()
     gpuComm->checkError("test");
 }
 
-void VRWidget::setData(vtkSmartPointer<vtkImageData> data)
+void VRWidget::setData(vtkSmartPointer<vtkImageData> data, vtkSmartPointer<vtkImageData> label)
 {
-        using namespace std;
-        int *extent = data->GetExtent();
-        int w = extent[1]+1,
-            h = extent[3]+1,
-            d = extent[5]+1;
-        gpuComm->vrParam.maxVolWidthInVoxel = max(max(w,h),d);
-        gpuComm->vrParam.volBoundry[0] = w/(float)gpuComm->vrParam.maxVolWidthInVoxel ;
-        gpuComm->vrParam.volBoundry[1] = h/(float)gpuComm->vrParam.maxVolWidthInVoxel ;
-        gpuComm->vrParam.volBoundry[2] = d/(float)gpuComm->vrParam.maxVolWidthInVoxel ;
+    double *range = data->GetScalarRange();
+    gpuComm->vrParam.value_min = range[0]-.1;
+    gpuComm->vrParam.value_dist = range[1]-range[0];
+    printf("Value range: %lf %lf\n", range[0], range[1]);
 
-        g_createBrickPool(w,h,d);
-        g_uploadBrickPool(data->GetScalarPointer(), w, h, d, 0,0,0);
+    int *extent = data->GetExtent();
+    int w = extent[1]+1,
+        h = extent[3]+1,
+        d = extent[5]+1;
+    gpuComm->vrParam.maxVolWidthInVoxel = max(max(w,h),d);
+    gpuComm->vrParam.volBoundry[0] = w/(float)gpuComm->vrParam.maxVolWidthInVoxel ;
+    gpuComm->vrParam.volBoundry[1] = h/(float)gpuComm->vrParam.maxVolWidthInVoxel ;
+    gpuComm->vrParam.volBoundry[2] = d/(float)gpuComm->vrParam.maxVolWidthInVoxel ;
 
-        double *range = data->GetScalarRange();
-        gpuComm->vrParam.value_min = range[0];
-        gpuComm->vrParam.value_dist = range[1]-range[0];
+    g_createBrickPool(w,h,d);
+    g_uploadBrickPool(data->GetScalarPointer(), w, h, d, 0,0,0);
 
-        initialized=true;
+    // label
+    g_createLabelPool(w,h,d);
+    g_uploadLabelPool(label->GetScalarPointer(), w, h, d, 0,0,0);
 
-        trfn_window->emitTranFunc();
+    initialized=true;
+
+    trfn_window->emitTranFunc();
 }
+
 
 void VRWidget::uploadTrFn2D()
 {

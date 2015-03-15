@@ -223,3 +223,62 @@ void g_releaseBrickPool()
     }
 }
 
+////////////////////////////////////////////////////
+/// label
+
+cudaArray *da_labelPool = 0;
+
+extern "C"
+void g_createLabelPool(int w, int h, int d)
+{
+    g_releaseLabelPool();
+
+    cudaExtent ext;
+    ext.width = w;    ext.height = h;    ext.depth = d;
+
+    // create 3D array
+    cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc<LOD_DATA_TYPE>();
+    CUDA_SAFE_CALL( cudaMalloc3DArray(&da_labelPool, &channelDesc, ext) );
+
+    // set texture parameters
+    texLabelPool.normalized = true; //false;                      // access with normalized texture coordinates?
+#ifdef LINTERP_LOD_DATA
+    texLabelPool.filterMode = cudaFilterModeLinear;      // linear interpolation
+#else
+    texLabelPool.filterMode = cudaFilterModePoint;
+#endif
+    texLabelPool.addressMode[0] = cudaAddressModeClamp;  // wrap texture coordinates
+    texLabelPool.addressMode[1] = cudaAddressModeClamp;
+    texLabelPool.addressMode[2] = cudaAddressModeClamp;
+
+    // bind array to 3D texture
+    CUDA_SAFE_CALL(cudaBindTextureToArray(texLabelPool, da_labelPool, channelDesc));
+    cudaThreadSynchronize();
+}
+
+
+extern "C"
+void g_uploadLabelPool(void *h_volume, int w, int h, int d, int x, int y, int z)
+{
+    // copy data to 3D array
+    cudaMemcpy3DParms copyParams = {0};
+    copyParams.srcPtr   = make_cudaPitchedPtr(h_volume, w*sizeof(LOD_DATA_TYPE), w, h);
+    copyParams.dstPos	= make_cudaPos(x,y,z);
+    copyParams.dstArray = da_labelPool;
+    copyParams.extent   = make_cudaExtent(w,h,d);
+    copyParams.kind     = cudaMemcpyHostToDevice;
+    CUDA_SAFE_CALL( cudaMemcpy3D(&copyParams) );
+}
+
+extern "C"
+void g_releaseLabelPool()
+{
+    if (NULL!=da_labelPool) {
+        cudaThreadSynchronize();
+        CUDA_SAFE_CALL(cudaFreeArray(da_labelPool));
+        da_labelPool = NULL;
+
+    }
+}
+
+
