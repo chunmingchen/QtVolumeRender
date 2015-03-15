@@ -1,4 +1,6 @@
 /////////////////////////////////////////////////////
+/// OpenGL+VTK widget on Qt
+///  Chun-Ming Chen
 /////////////////////////////////////////////////////
 
 #include "cpp_headers.h"
@@ -39,6 +41,9 @@ void openGL_VTK_window :: initializeGL()
 }
 void openGL_VTK_window :: resizeGL(int w, int h)
 {
+    glViewport(0,0,w,h);
+
+
     renWin->SetSize( w, h );
     cout << "resize" << endl;
 }
@@ -55,6 +60,8 @@ void openGL_VTK_window :: mousePressEvent(QMouseEvent *event)
         xform_mode = XFORM_ROTATE;
     else if (event->button()==Qt::RightButton)
         xform_mode = XFORM_SCALE;
+    else if (event->button()==Qt::MiddleButton)
+        xform_mode = XFORM_TRANSLATE;
     else
         xform_mode = XFORM_NONE;
 
@@ -83,6 +90,14 @@ void openGL_VTK_window :: mouseMoveEvent(QMouseEvent *event)
       float scale_size = (1 - (event->y() - lastPos.y())/120.0);
       if (scale_size <1e-5) scale_size = 1e-5;
       transform->Scale(scale_size, scale_size, scale_size);
+    }
+    else if (xform_mode == XFORM_TRANSLATE)    {
+        transform->PostMultiply();
+        int xdist = event->x() - lastPos.x();
+        int ydist = event->y() - lastPos.y();
+        transform->Translate(xdist*.1, ydist*.1, 0);
+        transform->PreMultiply();
+        transform->PrintSelf(cout, vtkIndent());
     }
     lastPos = event->pos();
     this->update();
@@ -118,13 +133,14 @@ void openGL_VTK_window :: paintGL()
     gluLookAt(0,0,5,0,0,0,0,1,0);
 
     // get modelview matrix
-    glLoadIdentity();
-    vtkMatrix4x4 *m = camera->GetModelViewTransformMatrix() ;
-    glMultTransposeMatrixd(  &m->Element[0][0] );
-    //glMultTransposeMatrixd(  &transform->GetMatrix()->Element[0][0] );
+    //glLoadIdentity();
+    //vtkMatrix4x4 *m = camera->GetModelViewTransformMatrix() ;
+    //glMultTransposeMatrixd(  &m->Element[0][0] );
+    glMultMatrixd(  &transform->GetMatrix()->Element[0][0] );
 
     //////////// draw /////////
     opengl_draw();
+    //glutWireTeapot(1);
     ///////////////////////////
 
     // Render VTK

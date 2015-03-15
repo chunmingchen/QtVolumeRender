@@ -1,4 +1,6 @@
 /////////////////////////////////////////////////////
+/// The volume rendering widget on Qt
+/// Chun-Ming Chen
 /////////////////////////////////////////////////////
 
 #ifndef VRWIDGE_HEADER_H
@@ -8,8 +10,11 @@
 #include "CudaGLBase.h"
 #include "openGL_VTK_window.h"
 #include "vtk_headers.h"
+#include "transfer_func1d.h"
 
 #define TrFn_WIDTH 256
+
+using namespace std;
 
 class VRWidget : public openGL_VTK_window
 {
@@ -30,19 +35,25 @@ public:
 
     void setData(vtkSmartPointer<vtkImageData> data);
 
-    void setTrFn2D(std::vector<float4> &trfn)
-    {
-        g_uploadTrFn(&trfn[0], TrFn_WIDTH*TrFn_WIDTH);
-    }
+    void setTrFn2D();
 
     void removeData() {//todo
         g_releaseTrFn();
     }
 
+public slots:
+
+    void on_trfn_changed(vector<float> &color, vector<float> &alpha);
+
 protected:
     CudaGLBase *gpuComm;
+    Transfer_Func1D *trfn_window;
 
     bool initialized = false;
+    
+    bool trfn_dirty = true;
+    vector<float4> trfn_table;
+    int trfn_table_xdim=0;
 
     virtual void opengl_draw();
 
@@ -50,6 +61,9 @@ protected:
     {
         gpuComm->setBgColor(make_float4(r/255.f,g/255.f,b/255.f,1.f));
     }
+
+    void uploadTrFn2D();
+
 };
 
 #endif

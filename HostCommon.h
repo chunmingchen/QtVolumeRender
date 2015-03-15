@@ -58,9 +58,12 @@ typedef struct {
 	//float intensity;
     float *d_zBuffer;
     float intensity;        // tuning opacity
+    float value_min;
+    float value_dist;
 
     //char restartRay;		// cannot use bool for kernel!?
 	char bFastRender;
+
 }VRParam;
 
 /////////////////////////////

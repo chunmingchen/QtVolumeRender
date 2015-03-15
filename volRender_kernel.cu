@@ -57,14 +57,14 @@ __global__ void d_render(float4 *d_output)
     uint out_idx = (y * c_vrParam.imgWidth) + x;
 
 #if 0 // debug trfn
-											d_output[out_idx] = d_trfnLookup(x/255.f,y/255.f);
+                                            d_output[out_idx] = tex2D(texTrFn, x/255.f,y/255.f);
 											return;
 #endif
 	// calculate eye ray in world space
 	// input: x,y  output: eyeRay
     Ray eyeRay;
 	{
-		int minw = min(c_vrParam.imgWidth, c_vrParam.imgHeight);
+        int minw = min(c_vrParam.imgWidth, c_vrParam.imgHeight);
 		float u = ((int)(x<<1) - c_vrParam.imgWidth) / (float) minw;
 		float v = ((int)(y<<1) - c_vrParam.imgHeight) / (float) minw;
 		

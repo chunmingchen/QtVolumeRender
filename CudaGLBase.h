@@ -1,3 +1,9 @@
+/////////////////////////////////////////////////////
+/// Cuda volume renderer base class
+/// Handles cuda setups, cuda-gl interop and geometry translation
+///  Chun-Ming Chen
+/////////////////////////////////////////////////////
+
 #ifndef _CudaGLBase_h_
 #define _CudaGLBase_h_
 // This .H file needs VRParam defined in advance

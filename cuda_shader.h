@@ -5,7 +5,7 @@
 #include "cuda_render.h"
 #include "cutil_math.h"
 
-//#define TRFN_2D
+#define TRFN_2D
 
 #define LINTERP_LOD_DATA //faster texture lookup, added on dec. 28, 2010
 // drawback: 1. blocky segment  2. cannot linear-interpolate on associated colors (intensity different between levels)
@@ -22,7 +22,7 @@
 texture<LOD_DATA_TYPE, 3, cudaReadModeElementType> texBrickPool;
 //texture<LOD_DATA_TYPE, 3, cudaReadModeNormalizedFloat> texBrickPool;
 
-// transfer function
+// 2d transfer function
 texture<float4, 2, cudaReadModeElementType> texTrFn;
 cudaArray *da_trFn = 0;
 // <Phong shading
@@ -75,18 +75,27 @@ inline __device__ float4 d_shader(const float3 &texPos)
 {
 #ifdef TRFN_2D
 #ifdef LINTERP_LOD_DATA
+    LOD_DATA_TYPE val = tex3D(texBrickPool, texPos.x, texPos.y, texPos.z);
+
+    // normalize val
+    val = (val-c_vrParam.value_min)*(c_vrParam.value_dist);    // rmap scale to [0 , 1]
+
+    // 1dtrfn lookup
+    return tex2D(texTrFn, val, val);
+
+    /// lod methods
 	// nearest neighbor
-	float seg = tex3D(texBrickPool, floor(texPos.x+.5f)+.5f, floor(texPos.y+.5f)+.5f, floor(texPos.z+.5f)+.5f).x;
+    //float seg = tex3D(texBrickPool, floor(texPos.x+.5f)+.5f, floor(texPos.y+.5f)+.5f, floor(texPos.z+.5f)+.5f).x;
 	// interpolation
-	float alpha = tex3D(texBrickPool, texPos.x, texPos.y, texPos.z).y;
+    //float alpha = tex3D(texBrickPool, texPos.x, texPos.y, texPos.z).y;
 	// trfn lookup
 	//return tex2D(texTrFn, seg*255.f+.5f, alpha*255.f);
-	return d_trfnLookup(seg, alpha);
+    //return d_trfnLookup(seg, alpha);
 
 #else
 	return d_texLerp3(texPos);
 #endif //LINTERP_LOD_DATA
-#else
+#else // no transfer function
     LOD_DATA_TYPE val = tex3D(texBrickPool, texPos.x, texPos.y, texPos.z) ;
     return make_float4(val, val, val, val *c_vrParam.intensity); // no trfn
 #endif
@@ -203,7 +212,7 @@ void mix_color(OUT float4 &originalColor, float4 &addColor, float sampDist)
 #else	// non-associated color
 #define mix_color(originalColor, addColor, sampDist)			\
 {																\
-	float w = (1.f - originalColor.w) * (1.0f - powf(1.0f - addColor.w , (float)sampDist));	\
+    float w = c_vrParam.intensity * (1.f - originalColor.w) * (1.0f - powf(1.0f - addColor.w , (float)sampDist));	\
 	originalColor.x += addColor.x * w;					\
 	originalColor.y += addColor.y * w;					\
 	originalColor.z += addColor.z * w;					\
@@ -225,15 +234,6 @@ void mix_color(OUT float4 &originalColor, float4 &addColor, int sampDist, float 
 		originalColor.z += addColor.z * w;
 	}
 }
-// non-associated color
-#define mix_color(originalColor, addColor, sampDist)			\
-{																\
-	addColor.w = c_vrParam.intensity * (1.f - originalColor.w) * (1.0f - powf(1.0f - addColor.w , (float)sampDist));	\
-	originalColor.x += addColor.x * addColor.w;					\
-	originalColor.y += addColor.y * addColor.w;					\
-	originalColor.z += addColor.z * addColor.w;					\
-	originalColor.w += addColor.w;								\
-}	
 #endif
 //////////////////////////////////////////////////////////////////////////
 
@@ -260,10 +260,10 @@ void g_createTrFn(int w, int h)
 	CUDA_SAFE_CALL( cudaMallocArray(&da_trFn, &channelDesc, w, h) );
 
 	// set texture parameters
-	texTrFn.normalized = false;                      // access with normalized texture coordinates
-	texTrFn.filterMode = cudaFilterModeLinear;      // linear interpolation
-	texTrFn.addressMode[0] = cudaAddressModeClamp;  // wrap texture coordinates
-	texTrFn.addressMode[1] = cudaAddressModeClamp;
+    texTrFn.normalized = true;                      // access with normalized texture coordinates
+    texTrFn.filterMode = cudaFilterModeLinear;      // linear interpolation
+    texTrFn.addressMode[0] = cudaAddressModeClamp;  // wrap texture coordinates
+    texTrFn.addressMode[1] = cudaAddressModeClamp;
 
 	// bind array to 3D texture
 	CUDA_SAFE_CALL(cudaBindTextureToArray(texTrFn, da_trFn, channelDesc));
@@ -273,8 +273,10 @@ void g_createTrFn(int w, int h)
 extern "C"
 void g_uploadTrFn(void *data, int len)
 {
-	CUDA_SAFE_CALL( cudaMemcpyToArray(da_trFn, 0, 0, data, len*sizeof(float)*4, cudaMemcpyHostToDevice) );  
-	//CUDA_SAFE_CALL(cudaBindTextureToArray(texTrFn, da_trFn));
+    CUDA_SAFE_CALL( cudaMemcpyToArray(da_trFn, 0, 0, data, len*sizeof(float4), cudaMemcpyHostToDevice) );
+
+    //cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc<float4>();
+    //CUDA_SAFE_CALL(cudaBindTextureToArray(texTrFn, da_trFn, channelDesc));
 }
 
 //////////////////////////////////////////////////////////////////////////

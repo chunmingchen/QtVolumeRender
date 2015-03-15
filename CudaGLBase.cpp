@@ -1,3 +1,9 @@
+/////////////////////////////////////////////////////
+/// Cuda volume renderer base class
+/// Handles cuda setups, cuda-gl interop and geometry translation
+///  Chun-Ming Chen
+/////////////////////////////////////////////////////
+
 #define OUTPUT_GL_TYPE_ID GL_FLOAT	// GL_UNSIGNED_BYTE
 #define OUTPUT_TO_TEXTURE
 
@@ -27,16 +33,12 @@ void CudaGLBase::setViewParam() {
     glGetDoublev(GL_MODELVIEW_MATRIX, (GLdouble *)m);
     vtkMatrix4x4::Transpose(m, mt);
     vtkMatrix4x4::Invert(mt, mtinv);
-    float f[12];
-    for (int i=0; i<12; i++) f[i] = mtinv[i];
+    for (int i=0; i<16; i++) vrParam.invViewMatrix[i] = mtinv[i];
+
     //f[0] = mtinv[0]; f[1] = mtinv[4]; f[2] = mtinv[8]; f[3] = mtinv[12];
     //f[4] = mtinv[1]; f[5] = mtinv[5]; f[6] = mtinv[9]; f[7] = mtinv[13];
     //f[8] = mtinv[2]; f[9] = mtinv[6]; f[10]= mtinv[10]; f[11] = mtinv[14];
-
-
-
-
-    memcpy((void *)vrParam.invViewMatrix, (void *)f, sizeof(float)*12);
+    //memcpy((void *)vrParam.invViewMatrix, (void *)f, sizeof(float)*12);
 }
 
 void CudaGLBase::initPixelBuffer(int width, int height){

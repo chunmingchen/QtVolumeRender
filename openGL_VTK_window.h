@@ -1,5 +1,8 @@
 /////////////////////////////////////////////////////
+/// OpenGL+VTK widget on Qt
+///  Chun-Ming Chen
 /////////////////////////////////////////////////////
+
 
 #ifndef OPENGL_VTK_HEADER_H
 #define OPENGL_VTK_HEADER_H
@@ -31,10 +34,8 @@ protected:
     vtkNew<vtkRenderer> ren;
     vtkNew<vtkRenderWindow> renWin;
     vtkNew<vtkTransform> transform;
-    int xform_mode = 0;
-    const int XFORM_NONE  = 0;
-    const int XFORM_ROTATE  = 1;
-    const int XFORM_SCALE = 2;
+    enum Xform{XFORM_NONE, XFORM_ROTATE, XFORM_SCALE, XFORM_TRANSLATE};
+    Xform xform_mode = XFORM_NONE;
 
     virtual void opengl_draw();
 };

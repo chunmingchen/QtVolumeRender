@@ -1,14 +1,17 @@
 /////////////////////////////////////////////////////
+/// The volume rendering widget on Qt
+/// Chun-Ming Chen
 /////////////////////////////////////////////////////
 
 #include "cpp_headers.h"
 #include "vtk_headers.h"
 #include "VRWidget.h"
 #include "GL/glut.h"
+#include "transfer_func1d.h"
 
 using namespace std;
 
-#define VR_MAX_STEPS 500
+#define VR_MAX_STEPS 1000
 #define FOV 60  // degree
 
 VRWidget :: VRWidget(QWidget *parent)
@@ -17,7 +20,7 @@ VRWidget :: VRWidget(QWidget *parent)
     gpuComm = new CudaGLBase();
     VRParam &vrParam = gpuComm->vrParam;
     vrParam.imgWidth = 256, vrParam.imgHeight=256;
-    vrParam.step = .5f;
+    vrParam.step = 1.f; //.5f;
     vrParam.imgWidth_coalesced = 256;
     vrParam.clippingVisible = 1.f;
     vrParam.dof = 1.f;
@@ -28,13 +31,28 @@ VRWidget :: VRWidget(QWidget *parent)
 
     gpuComm->setUnitLen(this->eyeAngle);
 
+    /// transfer function window
+    trfn_window = new Transfer_Func1D(NULL);
+    trfn_window->show();
+    QObject::connect(trfn_window, SIGNAL(trfn_changed(vector<float>&, vector<float>&)),
+                     this, SLOT(on_trfn_changed(vector<float>&, vector<float>&)));
+
+    /// init cuda transfer function    
+    g_releaseTrFn();
+    g_createTrFn(TrFn_WIDTH, TrFn_WIDTH);
 
 }
 
 VRWidget::~VRWidget()
 {
+    initialized = false;
     removeData();
     delete gpuComm;
+
+    g_releaseTrFn();
+
+    trfn_window->close();
+    delete trfn_window;
 
 }
 
@@ -88,12 +106,16 @@ void VRWidget:: opengl_draw()
     if (!initialized)
         return;
 
+    if (this->trfn_dirty){
+        this->uploadTrFn2D();
+        cudaDeviceSynchronize();
+    }
+
     PRINT("rendering frame started...\n");
 
     VRParam &vrParam = gpuComm->vrParam;
 
 
-    float s = vrParam.maxVolWidthInVoxel;
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     {
@@ -115,9 +137,8 @@ void VRWidget:: opengl_draw()
     glPopMatrix();
 
     gpuComm->checkError("test");
-
-
 }
+
 void VRWidget::setData(vtkSmartPointer<vtkImageData> data)
 {
         using namespace std;
@@ -133,10 +154,45 @@ void VRWidget::setData(vtkSmartPointer<vtkImageData> data)
         g_createBrickPool(w,h,d);
         g_uploadBrickPool(data->GetScalarPointer(), w, h, d, 0,0,0);
 
-        // init transfer function
-        g_releaseTrFn();
-        g_createTrFn(TrFn_WIDTH, TrFn_WIDTH);
+        double *range = data->GetScalarRange();
+        gpuComm->vrParam.value_min = range[0];
+        gpuComm->vrParam.value_dist = range[1]-range[0];
 
         initialized=true;
 
+        trfn_window->emitTranFunc();
+}
+
+void VRWidget::uploadTrFn2D()
+{
+    if (trfn_table.size()==0)
+        return ; // not initialized
+
+    g_uploadTrFn(&trfn_table[0], trfn_table.size());
+    trfn_dirty = false;
+}
+
+void VRWidget::on_trfn_changed(std::vector<float> &color, std::vector<float> &alpha)
+{
+    int w = color.size()/4;
+    int h = alpha.size();
+    if (w * h != trfn_table.size())
+    {
+        g_releaseTrFn();
+        g_createTrFn(w, h);
+        this->trfn_table_xdim = w;
+    }
+
+   // create a 2d table
+   trfn_table.clear();
+   int x,y;
+   for (y=0; y<h; y++)
+   {
+       for (x=0; x<w; x++)
+       {
+           trfn_table.push_back(make_float4(color[x*4], color[x*4+1], color[x*4+2], alpha[y]));
+       }
+   }
+   trfn_dirty = true;
+   this->updateGL();
 }
