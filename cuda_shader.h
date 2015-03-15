@@ -83,7 +83,7 @@ inline __device__ float4 d_shader(const float3 &texPos)
     LOD_DATA_TYPE label = tex3D(texLabelPool, texPos.x, texPos.y, texPos.z);
 
     // normalize val
-    val = (val-c_vrParam.value_min)*(c_vrParam.value_dist);    // rmap scale to [0 , 1]
+    val = (val-c_vrParam.value_min)/(c_vrParam.value_dist);    // rmap scale to [0 , 1]
 
     // 1dtrfn lookup
     return tex2D(texTrFn, val, label);
