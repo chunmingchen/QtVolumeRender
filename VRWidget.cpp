@@ -88,6 +88,9 @@ void VRWidget :: keyPressEvent(QKeyEvent* QE)
         if (vrParam.intensity < 1e-5) vrParam.intensity = 1e-5;
         cout << "Intensity = " << vrParam.intensity << endl;
         break;
+    case Qt::Key_B:
+        draw_boundbox = ! draw_boundbox;
+        break;
     }
 
 
@@ -128,13 +131,15 @@ void VRWidget:: opengl_draw()
     glPopMatrix();
 
     // Bounding box
-    glPushMatrix();
-    {
-        glScalef(vrParam.volBoundry[0],vrParam.volBoundry[1],vrParam.volBoundry[2]);
-        glColor3f(0,0,.5);
-        glutWireCube(1);
+    if (draw_boundbox) {
+        glPushMatrix();
+        {
+            glScalef(vrParam.volBoundry[0],vrParam.volBoundry[1],vrParam.volBoundry[2]);
+            glColor3f(0,0,.5);
+            glutWireCube(1);
+        }
+        glPopMatrix();
     }
-    glPopMatrix();
 
     gpuComm->checkError("test");
 }

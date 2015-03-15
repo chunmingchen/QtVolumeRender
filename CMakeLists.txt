@@ -42,15 +42,12 @@ endif(NOT OPENGL_FOUND)
 find_package(GLUT REQUIRED)
 include_directories(${GLUT_INCLUDE_DIRS})
 
-find_package(GLEW)
-include_directories(${GLEW_INCLUDE_DIRS})
-
 #########################################################
 # Include GLEW
 #########################################################
-#find_package(GLEW REQUIRED)
-#include_directories(${GLEW_INCLUDE_DIRS})
-#link_directories(${GLEW_LIBRARY_DIRS})
+find_package(GLEW)
+include_directories(${GLEW_INCLUDE_DIRS})
+link_directories(${GLEW_LIBRARY_DIRS})
 #add_definitions(${GLEW_DEFINITIONS})
 
 #if(NOT GLEW_FOUND)
@@ -107,14 +104,16 @@ add_executable(VolumeRender ${CXX_FILES} ${UISrcs} ${MOCSrcs} )
 #########################################################
 # Data path
 #########################################################
-#set(DATA_DIR "/data" CACHE PATH "Directory to PLOT3D data")
-#add_definitions(-DDATA_DIR=\"${DATA_DIR}/\")
+set(DATA_DIR "/data" CACHE PATH "Directory to data")
+add_definitions(-DDATA_DIR=\"${DATA_DIR}/\")
 #set(OUTPUT_DIR "/data" CACHE PATH "Directory to the output")
 #add_definitions(-DOUTPUT_DIR=\"${OUTPUT_DIR}/\")
 #set(SAVED_OUTPUT_DIR "/data/turbine_Stg/" CACHE PATH "Directory to the saved output")
 #add_definitions(-DSAVED_OUTPUT_DIR=\"${SAVED_OUTPUT_DIR}/\")
-#set(INIT_TIMESTEP "0" CACHE STRING "Initial simulation time step")
-#add_definitions(-DINIT_TIMESTEP=${INIT_TIMESTEP})
+set(MIN_TIMESTEP "1" CACHE STRING "Initial time step")
+add_definitions(-DMIN_TIMESTEP=${MIN_TIMESTEP})
+set(MAX_TIMESTEP "10" CACHE STRING "Last time step")
+add_definitions(-DMAX_TIMESTEP=${MAX_TIMESTEP})
 
 #########################################################
 # Link libraries

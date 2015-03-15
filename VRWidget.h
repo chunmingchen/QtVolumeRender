@@ -21,6 +21,7 @@ class VRWidget : public GLVTKWidget
     Q_OBJECT
 
 public:
+    bool draw_boundbox = false;
 
     VRWidget(QWidget *parent);
     virtual ~VRWidget();

@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-
+    file_idx = MIN_TIMESTEP;
 }
 
 MainWindow::~MainWindow()
@@ -25,8 +25,8 @@ void MainWindow::on_btnLoad_clicked()
     vtkNew<vtkImageCast> caster1, caster2;
 
     stringstream ss;
-    ss << "/data/flow2/soumya/raw_data/tornado_lambda2_" << file_idx << ".vti";
-
+    //ss << "/data/flow2/soumya/raw_data/tornado_lambda2_" << file_idx << ".vti";
+    ss << DATA_DIR << "vortex_" << file_idx << ".vti";
     /// data
     reader1->SetFileName(ss.str().c_str());
     reader1->Update();
@@ -40,8 +40,8 @@ void MainWindow::on_btnLoad_clicked()
 
     /// label
     ss.str("");
-    ss << "/data/flow2/soumya/visibility_fields/combined_final" << file_idx << ".vti";
-
+    //ss << "/data/flow2/soumya/visibility_fields/combined_final" << file_idx << ".vti";
+    ss << DATA_DIR << "combined_final" << file_idx << ".vti";
     reader2->SetFileName(ss.str().c_str());
     reader2->Update();
     this->label = reader2->GetOutput();
@@ -57,7 +57,7 @@ void MainWindow::on_btnLoad_clicked()
 
 void MainWindow::on_btnNext_clicked()
 {
-    if (file_idx < 10) {
+    if (file_idx < MAX_TIMESTEP) {
         file_idx ++;
         on_btnLoad_clicked();
     }
@@ -66,7 +66,7 @@ void MainWindow::on_btnNext_clicked()
 
 void MainWindow::on_btnPrev_clicked()
 {
-    if (file_idx > 1) {
+    if (file_idx > MIN_TIMESTEP) {
         file_idx --;
         on_btnLoad_clicked();
     }
